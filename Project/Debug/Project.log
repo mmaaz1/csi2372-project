@@ -1,0 +1,3 @@
+﻿  Bank.cpp
+C:\Users\maazt\source\repos\Project\Project\Bank.h(69): warning C4715: 'BankAccount::isSavingsAccount': not all control paths return a value
+  Project.vcxproj -> C:\Users\maazt\source\repos\Project\Debug\Project.exe
