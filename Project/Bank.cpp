@@ -16,7 +16,7 @@ using namespace std;
 
 double DepositAccount::rate = 6.50;
 double totalAccounts = 0.0;
-
+int ctr = 0;
 //******************************************************************
 // Basic functions of the BankAccount class
 //******************************************************************
@@ -191,16 +191,62 @@ inline void Transaction::setAmount(double amountTr)
 // Inputs: listAccount(BankAccount *), a list of bank accounts.
 // Outputs: listAccount(BankAccount *), sorted list of bank accounts.
 //****************************************************************************
-void sortAccounts(BankAccount** list)
+void swap(BankAccount **xp, BankAccount **yp)
+{
+    BankAccount* temp = *xp;
+    *xp = *yp;
+    *yp = temp;
+}
+BankAccount** sortAccounts(BankAccount** list)
 {
 
+    //BankAccount** tempList = new BankAccount * [K_SizeMax];
+
+    BankAccount temp;
+    
+
+    // sorting id
+    
+    for (int i = 0; i < ctr; i++){
+        // Last i elements are already in place
+        for (int j = 0; j < ctr-i-1; j++){   //6
+        
+            if (list[j]->getAccountId() > list[j+1]->getAccountId()){
+                swap(&list[j], &list[j+1]);
+            }
+        }
+    }
 
 
+    //sorting type
+    int attributes = 7;
+    for (int i = 0; i < attributes; i++){
+        // Last i elements are already in place
+        for (int j = 0; j < attributes-i-1; j++){
+            if (list[j]->getAccountId() == list[j+1]->getAccountId()){
+                if (list[j]->getType() > list[j+1]->getType()){
+                    swap(&list[j], &list[j+1]);
 
+                }
+            }
+        }
+    }
 
+    // seeing if sort worked
+    /*
+    cout<<"testing sort"<<endl;
+    for (int i = 0; i < 6; i++){
+        std::cout << list[i]->getAccountId() <<  "      ";
+        std::cout << list[i]->getClientName() <<  "      ";
+        std::cout << list[i]->getBalance() <<  "      ";
+        std::cout << list[i]->getType() <<  "      ";
+        std::cout << list[i]->isLoanAccount() <<  "      ";
+        std::cout << list[i]->isDepositAccount() <<  "      ";
+        std::cout << list[i]->getNbYears() <<  std::endl;
+    }
+    */
 
-
-
+    return list;
 
 }
 
@@ -239,16 +285,26 @@ BankAccount** readAccounts()
 
     while (inputFile && (counter < K_SizeMax - 1)) {
         // YOU HAVE TO DO SOMETHING FROM HERE !!!
-        *pAccount = new BankAccount(accountRead, TypeRead, nameRead, dateRead, balanceRead);
 
+        if (TypeRead == 1 || TypeRead == 2){
+            *pAccount = new BankAccount(accountRead, TypeRead, nameRead, dateRead, balanceRead);
+        }
+        if (TypeRead == 3){
+            *pAccount = new DepositAccount(accountRead, TypeRead, nameRead, dateRead, balanceRead, nbyearRead);
+        }
+        if (TypeRead == 4){
+            *pAccount = new LoanAccount(accountRead, TypeRead, nameRead, dateRead, balanceRead, nbyearRead, RateRead);
+        }
         // UNTIL THIS POINT.
 
         inputFile >> accountRead >> TypeRead >> dateRead >> balanceRead >> nbyearRead >> RateRead;
         inputFile.getline(nameRead, 60);
         pAccount++;
         counter++;
+        ctr++;
     }
-    *pAccount = new BankAccount(accountRead, TypeRead, nameRead, dateRead, balanceRead);
+    *pAccount = new BankAccount();
+    //*pAccount = new BankAccount(accountRead, TypeRead, nameRead, dateRead, balanceRead);
     return listAccounts;
 }
 
@@ -366,7 +422,6 @@ void updateAccounts(BankAccount** listAccounts) {
 
 
 
-
 }
 
 //******************************************************************************
@@ -383,18 +438,55 @@ void displayAccounts(BankAccount** listAccounts)
     for (int k = 0; k < K_SizeMax; k++) { find[k] = FALSE; }
 
     cout << "                       THE REPORT OF THE BANK ACCOUNTS OF CLIENTS" << endl;
-    cout << "                       ------------------------------------------" << endl << endl;
-
-    int i = 0;
+    cout << "                       ------------------------------------------" ;
 
 
+    int sum;
+
+    cout << endl << endl<< "           Client Name: " << listAccounts[0]->getClientName()<<endl<<endl;
+    cout << "       Bank Account      Type    Update Date    Balance    Nb.Years    Rate" <<endl;
+    cout << "       ------------      ----    -----------    -------    --------    ---- ";
+
+    for (int i = 0; i < ctr; i++){
+        
+        if (i>0 && listAccounts[i]->getAccountId() != listAccounts[i-1]->getAccountId()){
+            cout << endl << endl<< "           Client Name: " << listAccounts[i]->getClientName()<<endl<<endl;
+            cout << "       Bank Account      Type    Update Date    Balance    Nb.Years    Rate" <<endl;
+            cout << "       ------------      ----    -----------    -------    --------    ---- ";
+        }
+        cout << endl <<"       " << listAccounts[i]->getAccountId();
+        cout << "               " << listAccounts[i]->getType();
+        cout << "       " << listAccounts[i]->getUpdatedate();
+        cout << "        " << listAccounts[i]->getBalance();
 
 
+        //checking account
+        if (listAccounts[i]->getType() == 1){}
+
+        //savings account
+        if (listAccounts[i]->getType() == 2){}
+
+        //term deposit account
+        if (listAccounts[i]->getType() == 3){  
+            cout << "        " << listAccounts[i]->getNbYears();
+            cout << "        " << listAccounts[i]->getRate();
+        }
+        
+        //loan account
+        if (listAccounts[i]->getType() == 4){
+            cout << "        " << listAccounts[i]->getNbYears();
+            cout << "        " << listAccounts[i]->getRate();
+        }
 
 
-
-
-
+        sum=listAccounts[i]->getBalance()+sum;
+        if (listAccounts[i]->getAccountId() != listAccounts[i+1]->getAccountId()){
+            cout << endl << "                                               ----------";
+            cout << endl << "                          TOTAL ACCOUNTS: " <<sum;
+            sum = 0;
+        }
+        
+    }
 
 }
 
@@ -405,15 +497,16 @@ int main()
 {
     BankAccount** list = readAccounts();
     sortAccounts(list);
-    displayAccounts(list);
+    //cout<<list[5]->getClientName();
+    displayAccounts(list);/*
     updateAccounts(list);
     cout << endl << endl;
     cout << "               ************************************************" << endl;
     cout << "               * RE-DISPLAY OF DATA AFTER THE UPDATE *" << endl;
     cout << "               ************************************************" << endl;
     displayAccounts(list);
-    cout << endl;
+    cout << endl;*/
 
-    system("PAUSE");
+    //system("PAUSE");
     return 0;
 }

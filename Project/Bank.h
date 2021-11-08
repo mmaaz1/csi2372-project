@@ -73,7 +73,9 @@ class BankAccount
 
      // Possible operations
      virtual Bool acceptWithdrawal() const {return TRUE;}
-	 
+	virtual int getNbYears() const {return 0;}
+     virtual double getRate() const {return 0;}
+
 	// Purpose: This function validates whether the transaction code 
 	//          corresponds to the correct account:
 	//              - 01 ==> account (01: Check, 02: Savings, 03: Deposit and 04: Loan)
@@ -107,7 +109,7 @@ class BankAccount
 
 private:
      long accountId;
-	 long type;
+	long type;
      char * clientName;
      long updateDate;
      double balance;
@@ -180,6 +182,6 @@ private:
 // Functions to define and to use
 //******************************************************************
 BankAccount ** readAccounts();
-void sortAccounts(BankAccount **);
+BankAccount ** sortAccounts(BankAccount **);
 void updateAccounts(BankAccount **);
 void displayAccounts(BankAccount **);
